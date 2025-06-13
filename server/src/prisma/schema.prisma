@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model creditors {
+  creditor_id  Int       @id @default(autoincrement())
+  created_by   Int
+  full_name    String    @db.VarChar(100)
+  phone_number String?   @db.VarChar(20)
+  created_at   DateTime? @default(now()) @db.Timestamp(0)
+  users        users     @relation(fields: [created_by], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "creditors_ibfk_1")
+  credits      credits[]
+
+  @@index([created_by], map: "user_id_idx")
+}
+
+model credits {
+  credit_id    Int             @id @default(autoincrement())
+  credited_by  Int
+  created_by   Int
+  product_name String          @db.VarChar(255)
+  unit_price   Decimal         @db.Decimal(10, 2)
+  amount       Int
+  total_amount Decimal         @db.Decimal(10, 2)
+  status       credits_status? @default(unpaid)
+  creditors    creditors       @relation(fields: [credited_by], references: [creditor_id], onDelete: Cascade, onUpdate: NoAction, map: "credits_ibfk_1")
+  users        users           @relation(fields: [created_by], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "credits_ibfk_2")
+  payments     payments[]
+
+  @@index([created_by], map: "created_by_idx")
+  @@index([credited_by], map: "credited_by_idx")
+}
+
+model payments {
+  id          Int       @id @default(autoincrement())
+  credit_id   Int
+  amount_paid Decimal   @db.Decimal(10, 2)
+  paid_at     DateTime? @default(now()) @db.Timestamp(0)
+  credits     credits   @relation(fields: [credit_id], references: [credit_id], onDelete: Cascade, onUpdate: NoAction, map: "payments_ibfk_1")
+
+  @@index([credit_id], map: "credit_id_idx")
+}
+
+model users {
+  user_id      Int         @id @default(autoincrement())
+  full_name    String      @db.VarChar(255)
+  password     String?     @db.VarChar(255)
+  phone_number String      @unique(map: "phone_number") @db.VarChar(255)
+  creditors    creditors[]
+  credits      credits[]
+}
+
+enum credits_status {
+  unpaid
+  partial
+  paid
+}
