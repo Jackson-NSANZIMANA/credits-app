@@ -1,8 +1,8 @@
 {
   "name": "credits-app/backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
+  "description": "Backend and API for credits-app application",
+  "main": "index.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

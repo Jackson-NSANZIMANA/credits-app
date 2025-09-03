@@ -9,7 +9,7 @@ const login = async (req, res) => {
   if (!result) {
     throw new unauthenticatedError("Invalid phone number or password");
   }
-  res.status(200).json({ mesage: "Login successful" });
+  res.status(200).json({ mesage: `🙋‍♂️ Hey ${result.user}, Login successful` })
 };
 
 const signup = async (req, res) => {
